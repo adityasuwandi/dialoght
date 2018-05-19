@@ -14,211 +14,91 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This is a sample for a weather fulfillment webhook for an Dialogflow agent
-This is meant to be used with the sample weather agent for Dialogflow, located at
-https://console.dialogflow.com/api-client/#/agent//prebuiltAgents/Weather
+from __future__ import print_function
+from future.standard_library import install_aliases
+install_aliases()
 
-This sample uses the WWO Weather Forecast API and requires an WWO API key
-Get a WWO API key here: https://developer.worldweatheronline.com/api/
-"""
+from urllib.parse import urlparse, urlencode
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 import json
+import os
 
-from flask import Flask, request, make_response, jsonify
+from flask import Flask
+from flask import request
+from flask import make_response
 
-from forecast import Forecast, validate_params
-
+# Flask app should start in global layout
 app = Flask(__name__)
-log = app.logger
 
 
-@app.route('/', methods=['POST'])
+@app.route('/webhook', methods=['POST'])
 def webhook():
-    """This method handles the http requests for the Dialogflow webhook
-
-    This is meant to be used in conjunction with the weather Dialogflow agent
-    """
     req = request.get_json(silent=True, force=True)
+
+    res = processRequest(req)
+
+    res = json.dumps(res, indent=4)
+    # print(res)
+    r = make_response(res)
+    r.headers['Content-Type'] = 'application/json'
+    return r
+
+
+def processRequest(req):
     try:
         action = req.get('queryResult').get('action')
     except AttributeError:
         return 'json error'
-
     if action == 'weather':
-        res = weather(req)
-    elif action == 'weather.activity':
-        res = weather_activity(req)
-    elif action == 'weather.condition':
-        res = weather_condition(req)
-    elif action == 'weather.outfit':
-        res = weather_outfit(req)
-    elif action == 'weather.temperature':
-        res = weather_temperature(req)
-    else:
-        log.error('Unexpected action.')
-
-    print('Action: ' + action)
-    print('Response: ' + res)
-
-    return make_response(jsonify({'fulfillmentText': res}))
+    baseurl = "https://query.yahooapis.com/v1/public/yql?"
+    yql_query = makeYqlQuery(req)
+    if yql_query is None:
+        return {}
+    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+    result = urlopen(yql_url).read()
+    data = json.loads(result)
+    res = makeWebhookResult(data)
+    return res
 
 
-def weather(req):
-    """Returns a string containing text with a response to the user
-    with the weather forecast or a prompt for more information
-
-    Takes the city for the forecast and (optional) dates
-    uses the template responses found in weather_responses.py as templates
-    """
-    parameters = req['queryResult']['parameters']
-
-    print('Dialogflow Parameters:')
-    print(json.dumps(parameters, indent=4))
-
-    # validate request parameters, return an error if there are issues
-    error, forecast_params = validate_params(parameters)
-    if error:
-        return error
-
-    # create a forecast object which retrieves the forecast from a external API
-    try:
-        forecast = Forecast(forecast_params)
-    # return an error if there is an error getting the forecast
-    except (ValueError, IOError) as error:
-        return error
-
-    # If the user requests a datetime period (a date/time range), get the
-    # response
-    if forecast.datetime_start and forecast.datetime_end:
-        response = forecast.get_datetime_period_response()
-    # If the user requests a specific datetime, get the response
-    elif forecast.datetime_start:
-        response = forecast.get_datetime_response()
-    # If the user doesn't request a date in the request get current conditions
-    else:
-        response = forecast.get_current_response()
-
-    return response
+def makeYqlQuery(req):
+    result = req['queryResult']['parameters']['geo-city']
+    if city is None:
+        return None
+    return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
 
 
-def weather_activity(req):
-    """Returns a string containing text with a response to the user
-    with a indication if the activity provided is appropriate for the
-    current weather or a prompt for more information
+def makeWebhookResult(data):
+    query = data.get('query')
+    if query is None:
+        return {}
 
-    Takes a city, activity and (optional) dates
-    uses the template responses found in weather_responses.py as templates
-    and the activities listed in weather_entities.py
-    """
+    result = query.get('results')
+    if result is None:
+        return {}
 
-    # validate request parameters, return an error if there are issues
-    error, forecast_params = validate_params(req['queryResult']['parameters'])
-    if error:
-        return error
+    channel = result.get('channel')
+    if channel is None:
+        return {}
 
-    # Check to make sure there is a activity, if not return an error
-    if not forecast_params['activity']:
-        return 'What activity were you thinking of doing?'
+    item = channel.get('item')
+    location = channel.get('location')
+    units = channel.get('units')
+    if (location is None) or (item is None) or (units is None):
+        return {}
 
-    # create a forecast object which retrieves the forecast from a external API
-    try:
-        forecast = Forecast(forecast_params)
-    # return an error if there is an error getting the forecast
-    except (ValueError, IOError) as error:
-        return error
+    condition = item.get('condition')
+    if condition is None:
+        return {}
 
-    # get the response
-    return forecast.get_activity_response()
+    # print(json.dumps(item, indent=4))
 
+    speech = "Cuaca sekarang di " + location.get('city') + ": " + condition.get('text') + \
+             ", Dan suhunya sekitar " + condition.get('temp') + " " + units.get('temperature')
 
-def weather_condition(req):
-    """Returns a string containing a human-readable response to the user
-    with the probability of the provided weather condition occurring
-    or a prompt for more information
-
-    Takes a city, condition and (optional) dates
-    uses the template responses found in weather_responses.py as templates
-    and the conditions listed in weather_entities.py
-    """
-
-    # validate request parameters, return an error if there are issues
-    error, forecast_params = validate_params(req['queryResult']['parameters'])
-    if error:
-        return error
-
-    # Check to make sure there is a activity, if not return an error
-    if not forecast_params['condition']:
-        return 'What weather condition would you like to check?'
-
-    # create a forecast object which retrieves the forecast from a external API
-    try:
-        forecast = Forecast(forecast_params)
-    # return an error if there is an error getting the forecast
-    except (ValueError, IOError) as error:
-        return error
-
-    # get the response
-    return forecast.get_condition_response()
-
-
-def weather_outfit(req):
-    """Returns a string containing text with a response to the user
-    with a indication if the outfit provided is appropriate for the
-    current weather or a prompt for more information
-
-    Takes a city, outfit and (optional) dates
-    uses the template responses found in weather_responses.py as templates
-    and the outfits listed in weather_entities.py
-    """
-
-    # validate request parameters, return an error if there are issues
-    error, forecast_params = validate_params(req['queryResult']['parameters'])
-    if error:
-        return error
-
-    # Validate that there are the required parameters to retrieve a forecast
-    if not forecast_params['outfit']:
-        return 'What are you planning on wearing?'
-
-    # create a forecast object which retrieves the forecast from a external API
-    try:
-        forecast = Forecast(forecast_params)
-    # return an error if there is an error getting the forecast
-    except (ValueError, IOError) as error:
-        return error
-
-    return forecast.get_outfit_response()
-
-
-def weather_temperature(req):
-    """Returns a string containing text with a response to the user
-    with a indication if temperature provided is consisting with the
-    current weather or a prompt for more information
-
-    Takes a city, temperature and (optional) dates.  Temperature ranges for
-    hot, cold, chilly and warm can be configured in config.py
-    uses the template responses found in weather_responses.py as templates
-    """
-
-    parameters = req['queryResult']['parameters']
-
-    # validate request parameters, return an error if there are issues
-    error, forecast_params = validate_params(parameters)
-    if error:
-        return error
-
-    # If the user didn't specify a temperature, get the weather for them
-    if not forecast_params['temperature']:
-        return weather(req)
-
-    # create a forecast object which retrieves the forecast from a external API
-    try:
-        forecast = Forecast(forecast_params)
-    # return an error if there is an error getting the forecast
-    except (ValueError, IOError) as error:
-        return error
-
-    return forecast.get_temperature_response()
+    return make_response(jsonify({'fulfillmentText': speech}))
 
 
 if __name__ == '__main__':
