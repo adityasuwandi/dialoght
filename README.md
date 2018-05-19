@@ -1,26 +1,21 @@
-# Api.ai - sample webhook implementation in Python
+# lustenauBot - webhook setup on heroku
+ 
+ lustenauBot is a chatbot for the small austrian town "Lustenau". This is the associated webhook for some specific user requests.
+ 
+ More info about Api.ai webhooks could be found here:
+ [Api.ai Webhook](https://docs.api.ai/docs/webhook)
+ 
+ # Deploy on Heroku:
+ [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+ 
+ # What does it do?
+ - weather information fulfillment service, using [Yahoo! Weather API](https://developer.yahoo.com/weather/).
+ - building the url to give back a websearch as fallback return
+ - providing information on the next departure times at the local bus stations
+ 
+  # What is not yet done?
+  - information on upcoming events in lustenau
+  - smart and nice answers in webhook
+  - first request does not get an answer
 
-This is a really simple webhook implementation that gets Api.ai classification JSON (i.e. a JSON output of Api.ai /query endpoint) and returns a fulfillment response.
-
-More info about Api.ai webhooks could be found here:
-[Api.ai Webhook](https://docs.api.ai/docs/webhook)
-
-# Deploy to:
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-# What does the service do?
-It's a weather information fulfillment service that uses [Yahoo! Weather API](https://developer.yahoo.com/weather/).
-The services takes the `geo-city` parameter from the action, performs geolocation for the city and requests weather information from Yahoo! Weather public API. 
-
-The service packs the result in the Api.ai webhook-compatible response JSON and returns it to Api.ai.
-
-## How to make contributions?
-Please read and follow the steps in the [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-See [LICENSE](LICENSE).
-
-## Terms
-Your use of this sample is subject to, and by using or downloading the sample files you agree to comply with, the [Google APIs Terms of Service](https://developers.google.com/terms/).
-
-This is not an official Google product
+ The service packs the result in the Api.ai webhook-compatible response JSON and returns it to Api.ai.
