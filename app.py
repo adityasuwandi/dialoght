@@ -71,11 +71,8 @@ def makeWebhookResult(req):
         "fulfillmentText": "asuuuuuuuuu",
         "fulfillmentMessages": [
           {
-            "imageUrl": "https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg",
-            "type": 3,
             "card": {
               "title": plats,
-              "platform":"facebook",
               "subtitle": random.choice(lind),
               "imageUri": random.choice(listgambar),
             }
