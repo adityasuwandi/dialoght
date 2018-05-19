@@ -28,7 +28,7 @@ import os
 from flask import Flask
 from flask import request
 from flask import make_response
-from flask import jsonify
+from flask import
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -42,7 +42,7 @@ def webhook():
 
     res = json.dumps(res, indent=4)
     # print(res)
-    r = make_response(res)
+    r = make_response(jsonify({'fulfillmentText': res}))
     r.headers['Content-Type'] = 'application/json'
     return r
 
@@ -99,7 +99,7 @@ def makeWebhookResult(data):
     speech = "Cuaca sekarang di " + location.get('city') + ": " + condition.get('text') + \
              ", Dan suhunya sekitar " + condition.get('temp') + " " + units.get('temperature')
 
-    return make_response(jsonify({'fulfillmentText': speech}))
+    return speech
 
 
 if __name__ == '__main__':
