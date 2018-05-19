@@ -74,7 +74,7 @@ def makeWebhookResult(city):
     print(speech)
 
     return {
-        "fulfillmentText": result,
+        "fulfillmentText": speech,
         "fulfillmentMessages": [],
         #"payload": data,
         "outputContexts": [],
