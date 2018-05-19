@@ -59,7 +59,7 @@ def processRequest(req):
     # yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     # result = urlopen(yql_url).read()
     # data = json.loads(result)
-    city  req.get("queryResult").get("parameters").get("geo-city")
+    city = req.get("queryResult").get("parameters").get("geo-city")
     res = makeWebhookResult(city)
     return res
 
