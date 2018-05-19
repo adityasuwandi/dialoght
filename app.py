@@ -72,7 +72,7 @@ def makeWebhookResult(req):
             "card": {
               "title": plats,
               "subtitle": "Dilindungi Jasa Raharja",
-              "imageUri": listgambar[randint(0, 3)],
+              "imageUri": "https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg",
               "buttons": [
                 {
                   "text": "button text",
