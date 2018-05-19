@@ -69,7 +69,7 @@ def makeWebhookResult(req):
         "fulfillmentMessages": [
           {
             "card": {
-              "title": "card title",
+              "title": plats,
               "subtitle": "card text",
               "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
               "buttons": [
