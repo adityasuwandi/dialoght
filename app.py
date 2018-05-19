@@ -50,7 +50,7 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yesbos":
+    if req.get("queryResult").get("action") != "yesbos":
         return res
     # baseurl = "https://query.yahooapis.com/v1/public/yql?"
     # yql_query = makeYqlQuery(req)
@@ -59,7 +59,7 @@ def processRequest(req):
     # yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     # result = urlopen(yql_url).read()
     # data = json.loads(result)
-    result = req.get("result")
+    result = req.get("queryResult")
     parameters = result.get("parameters")
     city = parameters.get("geo-city")
     res = makeWebhookResult(city)
