@@ -52,9 +52,9 @@ def webhook():
 
 
 def processRequest(req):
-    #action = req.get('queryResult').get('action')
-
-    res = makeWebhookResult(req)
+    action = req.get('queryResult').get('action')
+    if action == 'plat':
+        res = makeWebhookResult(req)
     return res
 
 
