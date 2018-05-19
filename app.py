@@ -62,7 +62,8 @@ def makeWebhookResult(req):
     # print(json.dumps(item, indent=4))
 
     plat = req.get('queryResult').get('queryText')
-    plats = plat[-7]
+    plats = plat[-8:0]
+    listgambar["https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg", "https://asset.kompas.com/crop/102x0:687x390/750x500/data/photo/2016/03/15/1128185Tata-Motors-Angkot-2780x390.jpg", "http://www.promobilsuzuki.com/wp-content/uploads/2017/08/IMG-20170813-WA0011.jpg", "https://asset.kompas.com/crop/80x0:925x563/750x500/data/photo/2018/03/14/318039957.jpg"]
 
     return {
         "fulfillmentText": "This is a text response",
@@ -70,8 +71,8 @@ def makeWebhookResult(req):
           {
             "card": {
               "title": plats,
-              "subtitle": "card text",
-              "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+              "subtitle": "Dilindungi Jasa Raharja",
+              "imageUri": listgambar[randint(0, 3)],
               "buttons": [
                 {
                   "text": "button text",
