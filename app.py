@@ -998,8 +998,6 @@ def translateWeatherStrings(wetterText):
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
-    reload(sys)
-    sys.setdefaultencoding('utf-8')
     print("Starting app on port %d" % port)
 
     app.run(debug=False, port=port, host='0.0.0.0')
