@@ -24,6 +24,8 @@ from urllib.error import HTTPError
 
 import json
 import os
+import random
+
 
 from flask import Flask
 from flask import request
@@ -65,15 +67,14 @@ def makeWebhookResult(req):
     plats = plat[-8:-1]
     lind = ["Dilindungi Jasa Raharja", "Tidak Dilindungi Jasa Raharja"]
     listgambar = ["https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg", "https://asset.kompas.com/crop/102x0:687x390/750x500/data/photo/2016/03/15/1128185Tata-Motors-Angkot-2780x390.jpg", "http://www.promobilsuzuki.com/wp-content/uploads/2017/08/IMG-20170813-WA0011.jpg", "https://asset.kompas.com/crop/80x0:925x563/750x500/data/photo/2018/03/14/318039957.jpg"]
-
     return {
         "fulfillmentText": "This is a text response",
         "fulfillmentMessages": [
           {
             "card": {
               "title": plats,
-              "subtitle": lind[1],
-              "imageUri": listgambar[3],
+              "subtitle": random.choice(lind),
+              "imageUri": random.choice(listgambar),
             }
           }
         ]
