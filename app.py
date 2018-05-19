@@ -61,15 +61,15 @@ def makeWebhookResult(req):
 
     # print(json.dumps(item, indent=4))
 
-    print("Response:")
-    print(speech)
+    plat = req.get('queryResult').get('queryText')
+    plats = plat[-7]
 
     return {
         "fulfillmentText": "This is a text response",
         "fulfillmentMessages": [
           {
             "card": {
-              "title": "Plat AB9932HY",
+              "title": "card title",
               "subtitle": "card text",
               "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
               "buttons": [
