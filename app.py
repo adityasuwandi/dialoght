@@ -72,8 +72,8 @@ def makeWebhookResult(req):
           {
             "card": {
               "title": plats,
-              "subtitle": lind[random.randint(0,1)],
-              "imageUri": listgambar[random.randint(0,3)],
+              "subtitle": lind[1],
+              "imageUri": listgambar[3],
             }
           }
         ]
