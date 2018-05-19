@@ -76,11 +76,18 @@ def makeWebhookResult(city):
     print(speech)
 
     return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
+        "fulfillmentMessages": [
+  {
+    "card": {
+      "title": "card title",
+      "subtitle": "card text",
+      "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+      "buttons": [
+        {
+          "text": "button text",
+          "postback": "https://assistant.google.com/"
+        }
+      ]
     }
 
 
