@@ -1,7 +1,0 @@
-{
-  "name": "API.AI webhook lustenauBot",
-  "description": "API.AI webhook lustenauBot",
-  "repository": "https://github.com/koflerm/lustenaubot-webhook",
-  "logo": "http://xvir.github.io/img/apiai.png",
-  "keywords": ["api.ai", "natural language"]
-}
