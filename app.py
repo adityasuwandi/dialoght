@@ -28,7 +28,6 @@ import os
 from flask import Flask
 from flask import request
 from flask import make_response
-from flask import jsonify
 
 # Flask app should start in global layout
 app = Flask(__name__)
@@ -38,36 +37,56 @@ app = Flask(__name__)
 def webhook():
     req = request.get_json(silent=True, force=True)
 
+    print("Request:")
+    print(json.dumps(req, indent=4))
+
     res = processRequest(req)
 
     res = json.dumps(res, indent=4)
     # print(res)
-    r = make_response(jsonify({'fulfillmentText': res}))
+    r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
-    return r
+    return {
+    "fulfillmentText": "This is a text response",
+        "fulfillmentMessages": [
+          {
+            "card": {
+              "title": "card title",
+              "subtitle": "card text",
+              "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
+              "buttons": [
+                {
+                  "text": "button text",
+                  "postback": "https://assistant.google.com/"
+                }
+              ]
+            }
+          }
+        ]
+    }
 
 
 def processRequest(req):
-    try:
-        action = req.get('queryResult').get('action')
-    except AttributeError:
-        return 'json error'
-    if action == 'weather':
-        baseurl = "https://query.yahooapis.com/v1/public/yql?"
-        yql_query = makeYqlQuery(req)
-        if yql_query is None:
-            return {}
-        yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
-        result = urlopen(yql_url).read()
-        data = json.loads(result)
-        res = makeWebhookResult(data)
-        return res
+    if req.get("result").get("action") != "yahooWeatherForecast":
+        return {}
+    baseurl = "https://query.yahooapis.com/v1/public/yql?"
+    yql_query = makeYqlQuery(req)
+    if yql_query is None:
+        return {}
+    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+    result = urlopen(yql_url).read()
+    data = json.loads(result)
+    res = makeWebhookResult(data)
+    return res
 
 
 def makeYqlQuery(req):
-    result = req['queryResult']['parameters']['geo-city']
+    result = req.get("result")
+    parameters = result.get("parameters")
+    city = parameters.get("geo-city")
     if city is None:
         return None
+
     return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
 
 
@@ -99,7 +118,16 @@ def makeWebhookResult(data):
     speech = "Cuaca sekarang di " + location.get('city') + ": " + condition.get('text') + \
              ", Dan suhunya sekitar " + condition.get('temp') + " " + units.get('temperature')
 
-    return speech
+    print("Response:")
+    print(speech)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        # "data": data,
+        # "contextOut": [],
+        "source": "apiai-weather-webhook-sample"
+    }
 
 
 if __name__ == '__main__':
