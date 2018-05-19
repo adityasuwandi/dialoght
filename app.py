@@ -75,6 +75,7 @@ def makeWebhookResult(req):
             "type": 3,
             "card": {
               "title": plats,
+              "platform":"facebook",
               "subtitle": random.choice(lind),
               "imageUri": random.choice(listgambar),
             }
