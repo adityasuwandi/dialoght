@@ -37,9 +37,6 @@ app = Flask(__name__)
 def webhook():
     req = request.get_json(silent=True, force=True)
 
-    print("Request:")
-    print(json.dumps(req, indent=4))
-
     res = processRequest(req)
 
     res = json.dumps(res, indent=4)
@@ -50,26 +47,26 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yahooWeatherForecast":
-        return {}
-    baseurl = "https://query.yahooapis.com/v1/public/yql?"
-    yql_query = makeYqlQuery(req)
-    if yql_query is None:
-        return {}
-    yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
-    result = urlopen(yql_url).read()
-    data = json.loads(result)
-    res = makeWebhookResult(data)
-    return res
+    try:
+        action = req.get('queryResult').get('action')
+    except AttributeError:
+        return 'json error'
+    if action == 'weather':
+        baseurl = "https://query.yahooapis.com/v1/public/yql?"
+        yql_query = makeYqlQuery(req)
+        if yql_query is None:
+            return {}
+        yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+        result = urlopen(yql_url).read()
+        data = json.loads(result)
+        res = makeWebhookResult(data)
+        return res
 
 
 def makeYqlQuery(req):
-    result = req.get("result")
-    parameters = result.get("parameters")
-    city = parameters.get("geo-city")
+    result = req['queryResult']['parameters']['geo-city']
     if city is None:
         return None
-
     return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
 
 
@@ -101,16 +98,7 @@ def makeWebhookResult(data):
     speech = "Cuaca sekarang di " + location.get('city') + ": " + condition.get('text') + \
              ", Dan suhunya sekitar " + condition.get('temp') + " " + units.get('temperature')
 
-    print("Response:")
-    print(speech)
-
-    return {
-        "speech": speech,
-        "displayText": speech,
-        # "data": data,
-        # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
-    }
+    return make_response(jsonify({'fulfillmentText': speech}))
 
 
 if __name__ == '__main__':
