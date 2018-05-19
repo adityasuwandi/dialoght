@@ -59,9 +59,7 @@ def processRequest(req):
     # yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     # result = urlopen(yql_url).read()
     # data = json.loads(result)
-    result = req.get("queryResult")
-    parameters = queryResult.get("parameters")
-    city = parameters.get("geo-city")
+    city  req.get("queryResult").get("parameters").get("geo-city")
     res = makeWebhookResult(city)
     return res
 
@@ -76,7 +74,11 @@ def makeWebhookResult(city):
     print(speech)
 
     return {
-    "fulfillmentText": "This is a text response",
+        "fulfillmentText": result,
+        "fulfillmentMessages": [],
+        #"payload": data,
+        "outputContexts": [],
+        "source": "benny"
     }
 
 
