@@ -63,6 +63,7 @@ def makeWebhookResult(req):
 
     plat = req.get('queryResult').get('queryText')
     plats = plat[-8:-1]
+    lind = ["Dilindungi Jasa Raharja", "Tidak Dilindungi Jasa Raharja"]
     listgambar = ["https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg", "https://asset.kompas.com/crop/102x0:687x390/750x500/data/photo/2016/03/15/1128185Tata-Motors-Angkot-2780x390.jpg", "http://www.promobilsuzuki.com/wp-content/uploads/2017/08/IMG-20170813-WA0011.jpg", "https://asset.kompas.com/crop/80x0:925x563/750x500/data/photo/2018/03/14/318039957.jpg"]
 
     return {
@@ -71,14 +72,8 @@ def makeWebhookResult(req):
           {
             "card": {
               "title": plats,
-              "subtitle": "Dilindungi Jasa Raharja",
-              "imageUri": "https://www.otoniaga.com/wp-content/uploads/2017/07/6456/angkot-640x426.jpg",
-              "buttons": [
-                {
-                  "text": "button text",
-                  "postback": "https://assistant.google.com/"
-                }
-              ]
+              "subtitle": lind[randint(0,1)],
+              "imageUri": listgambar[randint(0,3)],
             }
           }
         ]
