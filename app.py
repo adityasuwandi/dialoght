@@ -50,16 +50,19 @@ def webhook():
 
 
 def processRequest(req):
-    res = makeWebhookResult()
+    #action = req.get('queryResult').get('action')
+
+    res = makeWebhookResult(req)
     return res
 
 
 
-def makeWebhookResult():
+def makeWebhookResult(req):
 
     # print(json.dumps(item, indent=4))
 
-    speech = "Cuaca sekarang di"
+    plat = req.get('queryResult').get('queryText')
+    plats = plat[-7:0]
 
     print("Response:")
     print(speech)
@@ -69,7 +72,7 @@ def makeWebhookResult():
         "fulfillmentMessages": [
           {
             "card": {
-              "title": "card title",
+              "title": plats,
               "subtitle": "card text",
               "imageUri": "https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png",
               "buttons": [
